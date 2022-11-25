@@ -1,0 +1,60 @@
+<?xml version="1.0" ?>
+
+<schema name="test">
+
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true"/>
+    <fieldType name="pdate" class="solr.DatePointField" docValues="true"/>
+    <fieldType name="tdouble" class="${solr.tests.DoubleFieldType}" docValues="${solr.tests.numeric.dv}"
+               omitNorms="true" positionIncrementGap="0"/>
+    <fieldType name="double" class="${solr.tests.DoubleFieldType}" docValues="${solr.tests.numeric.dv}" omitNorms="true"
+               positionIncrementGap="0"/>
+    <fieldType name="long" class="${solr.tests.LongFieldType}" docValues="${solr.tests.numeric.dv}"
+               positionIncrementGap="0"/>
+    <fieldType name="plong" class="solr.LongPointField" docValues="true"/>
+    <fieldType name="pint" class="solr.IntPointField" docValues="true"/>
+    <fieldType name="location" class="solr.LatLonPointSpatialField" docValues="true"/>
+    <fieldType name="bool" class="solr.BoolField" sortMissingLast="true"/>
+    <fieldType name="knn_vector_768" class="solr.DenseVectorField" vectorDimension="768" similarityFunction="cosine"/>
+    <fieldType name="knn_vector_384" class="solr.DenseVectorField" vectorDimension="384" similarityFunction="cosine"/>
+    <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+        <analyzer type="index">
+            <tokenizer class="solr.MockTokenizerFactory"/>
+            <filter class="solr.WordDelimiterGraphFilterFactory" generateWordParts="1" generateNumberParts="1"
+                    catenateWords="1" catenateNumbers="1" catenateAll="0" splitOnCaseChange="1"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.PorterStemFilterFactory"/>
+            <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+            <filter class="solr.FlattenGraphFilterFactory"/>
+        </analyzer>
+        <analyzer type="query">
+            <tokenizer class="solr.MockTokenizerFactory"/>
+            <filter class="solr.WordDelimiterGraphFilterFactory" generateWordParts="1" generateNumberParts="1"
+                    catenateWords="0" catenateNumbers="0" catenateAll="0" splitOnCaseChange="1"/>
+            <filter class="solr.LowerCaseFilterFactory"/>
+            <filter class="solr.PorterStemFilterFactory"/>
+            <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+        </analyzer>
+    </fieldType>
+
+    <field name="id" type="string" indexed="true" stored="true" multiValued="false" required="true"/>
+    <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
+    <field name="timestamp" type="pdate" indexed="true" stored="true"/>
+    <field name="name" type="string" indexed="true" stored="true"/>
+    <field name="postcode" type="string" indexed="true" stored="true"/>
+    <field name="title" type="text" indexed="true" stored="true"/>
+    <field name="title_vector" type="knn_vector_384" indexed="true" stored="true"/>
+    <field name="description_vector" type="knn_vector_768" indexed="true" stored="true"/>
+    <field name="featured" type="bool" indexed="true" stored="true" multiValued="false"/>
+    <field name="featured_advert" type="bool" indexed="true" stored="true" omitNorms="true"/>
+    <field name="features" type="string" indexed="true" stored="true" multiValued="true"/>
+    <field name="location" type="location" indexed="true" stored="true" multiValued="false"/>
+    <field name="pdate" type="pdate" indexed="true" stored="true" multiValued="false"/>
+    <field name="test_i" type="pint" indexed="true" stored="true" multiValued="false"/>
+    <field name="morton" type="plong" indexed="true" docValues="true" multiValued="false"/>
+    <dynamicField name="*_t" type="text" indexed="true" stored="true"/>
+    <dynamicField name="*_s" type="string" indexed="true" stored="true"/>
+    <dynamicField name="*_i" type="pint" indexed="true" multiValued="false" stored="true"/>
+    <dynamicField name="*_signatureField" type="string" indexed="true" stored="true" multiValued="false"/>
+    <dynamicField name="*_d" type="double" indexed="true" stored="true" multiValued="false"/>
+    <uniqueKey>id</uniqueKey>
+</schema>

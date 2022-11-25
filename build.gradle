@@ -1,0 +1,62 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'java'
+    id 'com.palantir.docker' version '0.32.0'
+}
+
+group 'com.cvlibrary'
+version '1.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        url "https://maven.restlet.org/"
+    }
+}
+
+docker {
+    name 'cvl-solr:9.0'
+    dockerfile file('src/docker/Dockerfile')
+    copySpec.from(jar).rename(".*","cvl-solr-${version}.jar")
+    buildArgs([JAR_FILE : "cvl-solr-${version}.jar"])
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/org.restlet.jee/org.restlet
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.0'
+
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.9.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.0'
+
+    implementation 'org.apache.solr:solr-core:9.0.0'
+    implementation 'org.apache.solr:solr-test-framework:9.0.0'
+
+
+    // https://mvnrepository.com/artifact/org.restlet.jee/org.restlet
+    implementation 'org.restlet.jee:org.restlet:2.3.0'
+
+    implementation 'org.projectlombok:lombok:1.18.22'
+
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    implementation 'com.google.guava:guava:31.1-jre'
+    implementation 'org.locationtech.spatial4j:spatial4j:0.8'
+    implementation 'com.carrotsearch:hppc:0.9.1'
+
+}
+
+shadowJar {
+    dependencies {
+        exclude(dependency('org.apache.solr:.*'))
+    }
+}
+
+test {
+    useJUnitPlatform {
+        includeEngines 'junit-jupiter', 'junit-vintage'
+    }
+    test {
+        systemProperty 'test.solr.allowed.securerandom', 'NativePRNG'
+    }
+}

@@ -1,0 +1,33 @@
+<?xml version="1.0" ?>
+<config>
+    <luceneMatchVersion>${tests.luceneMatchVersion:LATEST}</luceneMatchVersion>
+
+
+    <queryParser name="ss" class="com.cvlibrary.solr.queryparser.SemanticQParserPlugin"/>
+
+
+    <updateHandler>
+        <updateLog>
+            <str name="dir">${solr.data.dir:}</str>
+        </updateLog>
+    </updateHandler>
+
+
+    <requestHandler name="/select" class="solr.SearchHandler">
+        <bool name="httpCaching">true</bool>
+    </requestHandler>
+
+    <updateRequestProcessorChain name="dedupe-allfields" default="true">
+        <processor class="solr.LogUpdateProcessorFactory"/>
+        <processor class="solr.DistributedUpdateProcessorFactory"/>
+        <processor class="com.cvlibrary.solr.update.processor.SemanticUpdateProcessor">
+            <bool name="enabled">true</bool>
+            <lst name="vector_map">
+                <str name="fromField">title</str>
+                <str name="toField">title_vector</str>
+                <str name="uri">http://0.0.0.0/symmetric_embedding</str>
+            </lst>
+        </processor>
+        <processor class="solr.RunUpdateProcessorFactory"/>
+    </updateRequestProcessorChain>
+</config>
